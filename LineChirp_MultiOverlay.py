@@ -59,7 +59,7 @@ ResizedPX=2048/4
 Contrast=[0,1]
 CutWhiteParts=False
 CutNonColor=False
-NumberColors=2
+NumberColors=1
 AdjustColorBrightness=1
 
 ImageWidthPlotter=100
@@ -98,15 +98,15 @@ lenCol=NumberColors-1
 #%% Get the color matrices
 
 
-plt.imshow(ImBW,cmap='gray',origin='lower')
-plt.title('BW')
-plt.show()
-plt.imshow(ImColor,cmap='gray',origin='lower')
-plt.title('Saturation')
-plt.show()
-plt.imshow(Color,cmap='gray',origin='lower')
-plt.title('Color')
-plt.show()
+# plt.imshow(ImBW,cmap='gray',origin='lower')
+# plt.title('BW')
+# plt.show()
+# plt.imshow(ImColor,cmap='gray',origin='lower')
+# plt.title('Saturation')
+# plt.show()
+# plt.imshow(Color,cmap='gray',origin='lower')
+# plt.title('Color')
+# plt.show()
 
 
 

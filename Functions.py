@@ -18,7 +18,7 @@ from scipy import interpolate
 import os
 from IPython import display
 from skimage import io
-from sklearn.cluster import KMeans
+# from sklearn.cluster import KMeans
 from scipy.signal import medfilt2d, find_peaks
 from skimage import morphology
 from scipy.signal import convolve2d

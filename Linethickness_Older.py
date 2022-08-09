@@ -45,7 +45,7 @@ mpl.rcParams['axes.facecolor']='black'
 mpl.rcParams['savefig.facecolor']='black'
 
 Folder='Images/'
-Name='r1'
+Name='d1'
 Ending='.jpg'
 Filename=Folder+Name+Ending
 ResizedPX=2048/4

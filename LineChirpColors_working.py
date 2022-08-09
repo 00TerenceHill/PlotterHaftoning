@@ -51,7 +51,7 @@ mpl.rc("figure", dpi=220)
 #%% Here the definitions must be filled
 Folder='Images/'
 Name='ML-01-01'
-Name='Fritz4_2-01'
+Name='Fritz4-01'
 # Name='as1-01'
 # Ending='.tif'
 Ending='.png'

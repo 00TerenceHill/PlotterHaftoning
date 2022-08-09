@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+
+import Functions as fu
+
 import matplotlib.pyplot as plt
 # %matplotlib qt5
 def imadjust(x,a,b,c,d,gamma=1):
@@ -33,7 +36,7 @@ def imadjust(x,a,b,c,d,gamma=1):
 
 # Read image
 Folder='Images/'
-Name='as1'
+Name='d1'
 Ending='.jpg'
 color='HSV'
 Filename=Folder+Name+Ending
@@ -56,8 +59,11 @@ Im=imadjust(Im,.3,.9,0,1)
 # result=image.
 # Save the image
 print('Start Save')
-
-cv2.imwrite(Folder+Name + 'Upscaled' + '.jpg', Im*256)
+plt.imshow(Im)
+plt.axis('image')
+plt.axis('off')
+fu.SaveImagec(Name + 'UpScaled')
+plt.show()
 # plt.savefig(Name + '_UpScaled' +'.jpg', dpi=700, bbox_inches='tight', pad_inches=0)
 print('Start Plot')
 

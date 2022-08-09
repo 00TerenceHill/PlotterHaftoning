@@ -174,6 +174,28 @@ def readimage(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray'):
     y=np.linspace(0,Im.shape[1]-1,Im.shape[1])
     X,Y = np.meshgrid(y, x)
     return Im, x,y,X,Y     
+def readimage_normalized(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray'):
+    Im = cv2.imread(Filename)
+    Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
+
+    # Im=(Im-np.min(Im))/(np.max(Im)-np.min(Im))*256
+    width = int( ResizedPX)
+    height = int(Im.shape[0]/Im.shape[1]*ResizedPX)
+    dim = (width, height)
+    print('Start Resize')
+    Im = cv2.resize(Im,dim , interpolation=cv2.INTER_CUBIC )
+    Im=Im.astype('float')
+    Im=Im[::-1, :]
+    Im=Im/256
+    Im=1-Im
+    Im=imadjust(Im, Contrast[0],Contrast[1],0,1)
+    x=np.linspace(-1,1,Im.shape[1])
+    y=np.linspace(-1*Im.shape[0]/Im.shape[1],1*Im.shape[0]/Im.shape[1],Im.shape[0])
+    # x=np.linspace(-1,1,Im.shape[0])
+    # y=np.linspace(-1,1,Im.shape[1])
+    X,Y = np.meshgrid(x,y)
+    return Im, x,y,X,Y  
+
 def readimageRGB(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray'):
     Im = cv2.imread(Filename)
     Im = cv2.cvtColor(Im, cv2.COLOR_BGR2RGB)

@@ -17,6 +17,7 @@ Created on Thu Jul 14 22:37:51 2022
 Created on Sun Jan  9 18:17:50 2022
 
 @author: schmi
+
 """
 
 # -*- coding: utf-8 -*-
@@ -45,51 +46,57 @@ import scipy.ndimage as nd
 import matplotlib as mpl
 from scipy import interpolate
 from scipy.signal import medfilt2d, find_peaks
+from skimage import morphology
+
 from Functions import imadjust,ColorQunatization,ColorQunatizationRGB,readimageLAB,linewidth_from_data_units, readimage,SaveImagec,readimageRGB, readimageHSV, ImageByLineChirp
 mpl.rc("figure", dpi=220)
 
 #%% Here the definitions must be filled
 Folder='Images/'
 Name='ML-01-01'
-Name='Fritz4-01'
+Name='Fritz4_3'
 # Name='as1-01'
 # Ending='.tif'
 Ending='.png'
 
-# Name='ampersand-grid-1200'
-# Ending='.jpg'
+Name='Barista-01'
+Ending='.jpg'
 color='HSV'
 Filename=Folder+Name+Ending
 SaveImage=True
 ResizedPX=2048/4    
 Contrast=[0,1]
-CutWhiteParts=True
+CutWhiteParts=False
 CutNonColor=True
-NumberColors=5
+NumberColors=2
 AdjustColorBrightness=.7
 EnhanceColorSaturation=0.2
 colspace='LAB'
 # colspace='RGB'
+RemovingSmallPixelRegions=10
 
-
-ImageWidthPlotter=150
+ImageWidthPlotter=100
 PencilDiameter=.4
 
 
-x0=-.8
-y0=.0
-x0c=-.9
-y0c=.9
+x0=.8
+y0=1.5
+x0c=-1
+y0c=0
 
-Amplitude=.6
-ChirpFactor=.35
-Linedensity=.75*4.5
+Amplitude=.7/1
+ChirpFactor=.2
+Linedensity=.75*1.5
 #%%
 Im,x,y,X,Y=readimage(Filename,Contrast,ResizedPX,color=color)
 if CutWhiteParts==True:
-    Im[Im<.03]=0
+    IDX=Im<.03
+    IDX=morphology.area_closing(IDX,area_threshold=RemovingSmallPixelRegions)
+    IDX=morphology.area_opening(IDX,area_threshold=RemovingSmallPixelRegions)
+   
+    Im[IDX]=-0.001
 
-Im=Im**.7
+Im[Im>0]=Im[Im>0]**.7
 ImRGB=readimageRGB(Filename,Contrast,ResizedPX,color=color)
 
 
@@ -131,9 +138,9 @@ plt.show()
 ImLAB2=ImLAB.copy()
 ImLAB2[:,:,0]=0
 if colspace=='LAB':
-    Labels=ColorQunatization(ImLAB,lenCol)
+    Labels=ColorQunatization(ImLAB,lenCol,RemoveSmallPixelRegions=RemovingSmallPixelRegions)
 else:
-    Labels=ColorQunatizationRGB(ImRGB,lenCol)
+    Labels=ColorQunatizationRGB(ImRGB,lenCol,RemoveSmallPixelRegions=RemovingSmallPixelRegions)
 
 ls=np.shape(ImLAB[:,:,0])
 ColorIndArray=np.empty((ls[0],ls[1],lenCol),'float64')

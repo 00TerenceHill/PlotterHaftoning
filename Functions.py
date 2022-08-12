@@ -249,6 +249,27 @@ def readimageLAB(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray',NumberOfC
     return Im
 
 
+def readimageCMYK(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray',NumberOfColors=64):
+
+    from PIL import Image
+    image = Image.open(Filename)
+    
+    cmyk_image = image.convert('CMYK')
+    Im=np.asarray(cmyk_image)
+    Im=Im.astype('float')
+    
+    width = int( ResizedPX)
+    height = int(Im.shape[0]/Im.shape[1]*ResizedPX)
+    dim = (width, height)
+    print('Start Resize')
+    Im = cv2.resize(Im,dim , interpolation=cv2.INTER_CUBIC )
+    # Im=ColorQunatization(Im,NumberOfColors)
+    Im=Im/255
+    Im[Im>1]=1
+    Im=Im[::-1, :,:]
+    return Im
+
+
 def readimageHSV_Alternative(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray',NumberOfColors=64):
     Im = cv2.imread(Filename)
     width = int( ResizedPX)

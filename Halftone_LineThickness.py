@@ -33,7 +33,7 @@ from scipy import interpolate
 mpl.rc("figure", dpi=720)
 # %% Read image
 Folder='Images/'
-Name='d1'
+Name='VG1'
 Ending='.jpg'
 Im = cv2.imread(Folder+Name+Ending)
 Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
@@ -65,6 +65,21 @@ Im=np.pad(Im,Pad,'maximum')
 xr=np.linspace(np.min(x),np.max(x),20)
 yr=np.linspace(np.min(y),np.max(y),20)
 
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return rho, phi
+def pol2cart(rho, phi):
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return x, y
+
+rho, phi=cart2pol(xr,yr)
+rho=np.ceil(rho*Linedensity/2/np.pi)*2*np.pi/Linedensity
+xr,yr=pol2cart(rho,phi)
+xr=xr
+yr=yr
+
 
 
 xr,yr = np.meshgrid(xr, yr)
@@ -73,8 +88,8 @@ xr,yr = np.meshgrid(xr, yr)
 xr=xr.flatten()
 yr=yr.flatten()
 
-xr=xr+2*(np.random.rand(len(xr))-.5)*.3*(xr[2]-xr[1])
-yr=yr+2*(np.random.rand(len(xr))-.5)*.3*(xr[2]-xr[1])
+xr=xr+2*(np.random.rand(len(xr))-.5)*.45*(xr[2]-xr[1])
+yr=yr+2*(np.random.rand(len(xr))-.5)*.45*(xr[2]-xr[1])
 
 
 
@@ -91,8 +106,8 @@ dRy2 = interpolate.RectBivariateSpline(y, x, dRy)
 
 # Z2 = interp_spline(y2, x2)
 
-xr2=xr+dRy2.ev(yr,xr)*2*dRm
-yr2=yr+dRx2.ev(yr,xr)*2*dRm
+xr2=xr+dRy2.ev(yr,xr)*2.5*dRm
+yr2=yr+dRx2.ev(yr,xr)*2.5*dRm
 
 xr4=np.vstack((xr,xr2))
 yr4=np.vstack((yr,yr2))

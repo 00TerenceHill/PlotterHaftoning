@@ -103,8 +103,8 @@ def ImageByLineChirp(xline,yline,drm,X,Y,ImU,CutWhiteParts=False,CutNonColor=Fal
     xline=xline-dyl*np.sin(lwidths*ChirpFactor)*imadjust(lwidths2,0,.8,0,1,gamma=1)*drm/2
     yline=yline+dxl*np.sin(lwidths*ChirpFactor)*imadjust(lwidths2,0,.8,0,1,gamma=1)*drm/2
     if CutWhiteParts is True:
-        xline[(lwidths2<.03)  ]=np.nan
-        yline[(lwidths2<.03) ]=np.nan
+        xline[(lwidths2<.0)  ]=np.nan
+        yline[(lwidths2<.0) ]=np.nan
     if CutNonColor is True:
         xline[lwidths2<0]=np.nan
         yline[lwidths2<0]=np.nan
@@ -348,7 +348,7 @@ def inpaint_nans(im):
         im = im2
         nans = np.isnan(im)
     return im
-def ColorQunatization(Im,NumberOfColors):
+def ColorQunatization(Im,NumberOfColors,RemoveSmallPixelRegions=15):
     L=Im[:,:,0]
     A=Im[:,:,1]
     B=Im[:,:,2]
@@ -374,17 +374,17 @@ def ColorQunatization(Im,NumberOfColors):
     # center = np.uint8(center)
     # final_img = center[label.flatten()]
     # final_img = final_img.reshape(image.shape)
-    final_img=label.reshape(image.shape[0:2])
+    Label=label.reshape(image.shape[0:2])
 
-    val=np.mean(final_img[indx])
-    final_img[indx]=-1
-    final_img[final_img>val]=final_img[final_img>val]-1    
-    
-    final_img=morphology.area_opening(final_img,area_threshold=15)
-    final_img=morphology.area_closing(final_img,area_threshold=15)
-    return final_img
+    val=np.mean(Label[indx])
+    Label[indx]=-1
+    Label[Label>val]=Label[Label>val]-1    
+    Label=morphology.area_closing(Label,area_threshold=RemoveSmallPixelRegions)
+    Label=morphology.area_opening(Label,area_threshold=RemoveSmallPixelRegions)
+    # Label=medfilt2d(Label,5)
+    return Label
 
-def ColorQunatizationRGB(Im,NumberOfColors):
+def ColorQunatizationRGB(Im,NumberOfColors,RemoveSmallPixelRegions=15):
     R=Im[:,:,0]
     G=Im[:,:,1]
     B=Im[:,:,2]
@@ -435,9 +435,9 @@ def ColorQunatizationRGB(Im,NumberOfColors):
     val=np.mean(final_img[indx])
     final_img[indx]=-1
     final_img[final_img>val]=final_img[final_img>val]-1    
-    final_img=morphology.area_opening(final_img,area_threshold=15)
-    final_img=morphology.area_closing(final_img,area_threshold=15)
-
+    final_img=morphology.area_closing(final_img,area_threshold=RemoveSmallPixelRegions)
+    final_img=morphology.area_opening(final_img,area_threshold=RemoveSmallPixelRegions)
+    # final_img=medfilt2d(final_img,3)
     return final_img
 
 def SaveImage(Name):

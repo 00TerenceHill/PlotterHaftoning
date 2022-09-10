@@ -22,7 +22,11 @@ from skimage import io
 from scipy.signal import medfilt2d, find_peaks
 from skimage import morphology
 from scipy.signal import convolve2d
+from scipy.ndimage import  median_filter
+from skimage.morphology import rectangle   # for Structuring Elements (e.g. disk, rectangle)
+from skimage.filters.rank import modal     # the puppy we want
 
+from scipy import ndimage
 from scipy import interpolate
 class data_linewidth_plot():
     def __init__(self, x, y, **kwargs):
@@ -152,7 +156,27 @@ def imadjust(x,a,b,c,d,gamma=1):
     y[y>d]=d
     
     return y
+def readimages(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray'):
+    Im = cv2.imread(Filename)
+    Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
 
+    # Im=(Im-np.min(Im))/(np.max(Im)-np.min(Im))*256
+    width = int( ResizedPX)
+    height = int(Im.shape[0]/Im.shape[1]*ResizedPX)
+    dim = (width, height)
+    print('Start Resize')
+    Im = cv2.resize(Im,dim , interpolation=cv2.INTER_CUBIC )
+    Im=Im.astype('float')
+    Im=Im[::-1, :]
+    Im=Im/256
+    Im=1-Im
+    Im=imadjust(Im, Contrast[0],Contrast[1],0,1)
+    x=-np.linspace(-1,1,Im.shape[0])*np.pi*1
+    y=np.linspace(-1*Im.shape[1]/Im.shape[0],1*Im.shape[1]/Im.shape[0],Im.shape[1])*np.pi*1
+    y=np.linspace(0,Im.shape[0]-1,Im.shape[0])
+    x=np.linspace(0,Im.shape[1]-1,Im.shape[1])
+    X,Y = np.meshgrid(x, y)
+    return Im, x,y,X,Y   
 def readimage(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray'):
     Im = cv2.imread(Filename)
     Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
@@ -266,6 +290,8 @@ def readimageCMYK(Filename,Contrast=[0, 0],ResizedPX=[512],color='gray',NumberOf
     # Im=ColorQunatization(Im,NumberOfColors)
     Im=Im/255
     Im[Im>1]=1
+    Im[Im<0]=0
+    
     Im=Im[::-1, :,:]
     return Im
 
@@ -379,8 +405,50 @@ def ColorQunatization(Im,NumberOfColors,RemoveSmallPixelRegions=15):
     val=np.mean(Label[indx])
     Label[indx]=-1
     Label[Label>val]=Label[Label>val]-1    
+    Label2=morphology.area_closing(Label,area_threshold=RemoveSmallPixelRegions)
+    Label3=morphology.area_opening(Label2,area_threshold=RemoveSmallPixelRegions)
+    # Label=medfilt2d(Label,5)
+    return Label3
+
+def ColorQunatizationCMYK(Im,NumberOfColors,RemoveSmallPixelRegions=15):
+
+       
+    image=Im*255
+    k=NumberOfColors+1
+    
+    ImG=(Im[:,:,0]**2+Im[:,:,1]**2+Im[:,:,2]**2)**.5
+    # Gray=(A**2+B**2+L**2)**.5
+    indx=(ImG<.05) 
+    
+    
+    i = np.float32(image).reshape(-1,3)
+    condition = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER,20,1.0)
+    ret,label,center = cv2.kmeans(i, k , None, condition,10,cv2.KMEANS_RANDOM_CENTERS)
+    # center = np.uint8(center)
+    # final_img = center[label.flatten()]
+    # final_img = final_img.reshape(image.shape)
+    Label=label.reshape(image.shape[0:2])
+    val=np.mean(Label[indx])
+    Label[indx]=-1
+    Label[Label>val]=Label[Label>val]-1    
+    # Label=medfilt2d(Label,5)
     Label=morphology.area_closing(Label,area_threshold=RemoveSmallPixelRegions)
     Label=morphology.area_opening(Label,area_threshold=RemoveSmallPixelRegions)
+    # Zlabeled,Nlabels = ndimage.measurements.label(Label)
+    # label_size = [(Label == label-1).sum() for label in range(k + 1)]
+    # for label,size in enumerate(label_size): print("label %s is %s pixels in size" % (label,size))
+    
+    # # now remove the labels
+    # for label,size in enumerate(label_size):
+    #     if size < 2:
+    #         Label[Label == label] = 0
+
+    
+    
+    # Label=median_filter(Label,size=(5,5))-2
+    # Label2=morphology.remove_small_holes(Label+2,area_threshold=RemoveSmallPixelRegions,connectivity=1)-2
+    # Label=morphology.remove_small_objects(Label+2,min_size=RemoveSmallPixelRegions,connectivity=1)-2
+    # Label4 = modal(Label3+2,rectangle(2,2))-2
     # Label=medfilt2d(Label,5)
     return Label
 

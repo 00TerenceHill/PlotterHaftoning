@@ -11,34 +11,58 @@ import matplotlib as mpl
 from scipy import interpolate
 import os
 from IPython import display
-from Functions import imadjust, readimage,SaveImage,SaveImagec
+from Functions import imadjust, readimages,SaveImage,SaveImagec
 mpl.rc("figure", dpi=300)
 
 # Read image
 Folder='Images/'
-Name='d1'
+Name='VG1'
 Ending='.jpg'
 Filename=Folder+Name+Ending
 ResizedPX=2048/4
 FrequencyVal=.15*.4
-Contrast=[0.01,.99]
-n_iter=30
-numpoints=3e3
+Contrast=[0.05,.95]
+n_iter=300
+numpoints=26e3
 startp=np.floor(numpoints/3/3/3*1.2)
-pointsize=[.5, 3]
+# startp=3000
 
-Im, x,y,X,Y=readimage(Filename,Contrast,ResizedPX)
+pointsize=[.2, 1]
+
+Im, x,y,X,Y=readimages(Filename,Contrast,ResizedPX)
+Im=Im**1
+plt.imshow(1-Im,origin='lower',cmap='gray')
+plt.axis('off')
+plt.show()
 
 print('Calculating image')
 
 xline=np.random.rand(int(startp))*(np.max(x))
 yline=np.random.rand(int(startp))*(np.max(y))
 
+
+xline=np.linspace(0,np.max(x),100)
+yline=np.linspace(0,np.max(y),100)
+dx=xline[2]-xline[1]
+dy=yline[2]-yline[1]
+
+xline,yline=np.meshgrid(xline,yline)
+xline=xline.flatten()
+yline=yline.flatten()
+xline2=xline+dx/2
+yline2=yline+dy/2
+xline=np.append(xline,xline2)
+yline=np.append(yline,yline2)
+ImInt=interpolate.griddata((X.flatten(),Y.flatten()), Im.flatten(),(xline,yline),fill_value=-1) #*10*np.sqrt((xline)**2+yline**2)
+xline=np.delete(xline,ImInt<0.1)
+yline=np.delete(yline,ImInt<0.1)
+
+plt.plot(xline,yline)
 # %%
 fig=plt.figure(1)
 plt.clf()
 # print(np.sum(pos))
-density, x,y,X,Y=readimage(Filename,Contrast,ResizedPX*4)
+density, x,y,X,Y=readimages(Filename,Contrast,ResizedPX*4)
 density_P = density.cumsum(axis=1)
 density_Q = density_P.cumsum(axis=1)
 points=np.array([xline*4,yline*4]).T

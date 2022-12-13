@@ -16,7 +16,7 @@ mpl.rc("figure", dpi=300)
 
 # Read image
 Folder='Images/'
-Name='d1'
+Name='v1'
 Ending='.jpg'
 Filename=Folder+Name+Ending
 ResizedPX=2048/4

@@ -33,7 +33,7 @@ from scipy import interpolate
 mpl.rc("figure", dpi=720)
 # %% Read image
 Folder='Images/'
-Name='VG1'
+Name='j1'
 Ending='.jpg'
 Im = cv2.imread(Folder+Name+Ending)
 Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
@@ -41,24 +41,25 @@ Im = cv2.cvtColor(Im, cv2.COLOR_BGR2GRAY)
 SaveImage=True
 ResizedPX=2048
 Pad=100
-Linedensity=64*5 
+Linedensity=64*4
 
 Contrast=[0,1]
-x0=1.5
-y0=-.5
-linew=.3
+
+x0=1
+y0=1
+linew=.41
 #%%
 
 Filename=Folder+Name+Ending
 Im,x,y,X,Y=fu.readimage_normalized(Filename,Contrast,ResizedPX)
 Im=np.abs(1-Im)
-Im[Im<.1]=.1
+Im[Im<.03]=.03
 
 Phi=np.arctan2(Y-y0,X-x0)
 R=np.sqrt((X-x0)**2+(Y-y0)**2)
 Im=np.sin(R*Linedensity)+(Im*2-1)
 dRm=2*np.pi/Linedensity
-Im[Im<0]=0
+Im[Im<0.0]=0
 Im[Im>0]=1
 Im=np.pad(Im,Pad,'maximum')
 
@@ -88,8 +89,8 @@ xr,yr = np.meshgrid(xr, yr)
 xr=xr.flatten()
 yr=yr.flatten()
 
-xr=xr+2*(np.random.rand(len(xr))-.5)*.45*(xr[2]-xr[1])
-yr=yr+2*(np.random.rand(len(xr))-.5)*.45*(xr[2]-xr[1])
+xr=xr+2*(np.random.rand(len(xr))-.5)*.35*(xr[2]-xr[1])
+yr=yr+2*(np.random.rand(len(xr))-.5)*.35*(xr[2]-xr[1])
 
 
 

@@ -219,7 +219,7 @@ def voronoi(points, bbox):
     return vor
 
 
-def centroids(points, density, density_P=None, density_Q=None):
+def  centroids(points, density, density_P=None, density_Q=None):
     """
     Given a set of point and a density array, return the set of weighted
     centroids.

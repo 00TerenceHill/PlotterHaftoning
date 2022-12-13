@@ -48,45 +48,47 @@ from scipy import interpolate
 from scipy.signal import medfilt2d, find_peaks
 from skimage import morphology
 
-from Functions import imadjust,ColorQunatization,ColorQunatizationRGB,readimageLAB,linewidth_from_data_units, readimage,SaveImagec,readimageRGB, readimageHSV, ImageByLineChirp
+from Functions import imadjust,ColorQunatization,ColorQunatizationRGB,ColorQunatizationCMYK,readimageLAB,readimageCMYK,linewidth_from_data_units, readimage,SaveImagec,readimageRGB, readimageHSV, ImageByLineChirp
 mpl.rc("figure", dpi=220)
 
 #%% Here the definitions must be filled
 Folder='Images/'
 Name='ML-01-01'
-Name='Fritz4_3'
+Name='rb-01'
 # Name='as1-01'
 # Ending='.tif'
 Ending='.png'
 
-Name='Barista-01'
-Ending='.jpg'
+# Name='Barista-01'
+# Ending='.jpg'
 color='HSV'
 Filename=Folder+Name+Ending
 SaveImage=True
 ResizedPX=2048/4    
 Contrast=[0,1]
-CutWhiteParts=False
+CutWhiteParts=True
 CutNonColor=True
-NumberColors=2
+NumberColors=5
 AdjustColorBrightness=.7
-EnhanceColorSaturation=0.2
+EnhanceColorSaturation=0.9
 colspace='LAB'
-# colspace='RGB'
+colspace='RGB'
+colspace='CMYK'
+
 RemovingSmallPixelRegions=10
 
-ImageWidthPlotter=100
+ImageWidthPlotter=50
 PencilDiameter=.4
 
 
-x0=.8
-y0=1.5
-x0c=-1
-y0c=0
+x0=0
+y0=-1
+x0c=0
+y0c=-1
 
-Amplitude=.7/1
-ChirpFactor=.2
-Linedensity=.75*1.5
+Amplitude=.8/1
+ChirpFactor=.3
+Linedensity=.75*1
 #%%
 Im,x,y,X,Y=readimage(Filename,Contrast,ResizedPX,color=color)
 if CutWhiteParts==True:
@@ -103,12 +105,18 @@ ImRGB=readimageRGB(Filename,Contrast,ResizedPX,color=color)
 
 ImLAB=readimageLAB(Filename,Contrast,ResizedPX)
 
+
 L=ImLAB[:,:,0]
 A=ImLAB[:,:,1]
 B=ImLAB[:,:,2]
 ImColor=(ImLAB[:,:,1]**2+ImLAB[:,:,2]**2)**.5
 ImColor=ImColor**(1.001-EnhanceColorSaturation)
 ImColor=ImColor/np.max(ImColor)
+
+
+
+ImCMYK=readimageCMYK(Filename,Contrast,ResizedPX)
+ImCMYK=ImCMYK[:,:,0:3]
 lenCol=NumberColors-1
 
 #%% Get the color matrices
@@ -139,6 +147,10 @@ ImLAB2=ImLAB.copy()
 ImLAB2[:,:,0]=0
 if colspace=='LAB':
     Labels=ColorQunatization(ImLAB,lenCol,RemoveSmallPixelRegions=RemovingSmallPixelRegions)
+    
+    
+if colspace=='CMYK':
+    Labels=ColorQunatizationCMYK(ImCMYK,lenCol,RemoveSmallPixelRegions=RemovingSmallPixelRegions)
 else:
     Labels=ColorQunatizationRGB(ImRGB,lenCol,RemoveSmallPixelRegions=RemovingSmallPixelRegions)
 
